@@ -62,19 +62,25 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const { name, email } = user;
 
         await connectDB(); // db 연결
-        const existingUser = await User.findOne({ authProviderId: user.id });
+        const existingUser = await User.findOne({
+          email,
+          authProviderId: "github",
+        });
 
         if (!existingUser) {
           // 소셜 가입
           await new User({
             name,
             email,
-            authProviderId: user.id,
+            authProviderId: "github",
             role: "user",
           }).save();
         }
 
-        const socialUser = await User.findOne({ authProviderId: user.id });
+        const socialUser = await User.findOne({
+          email,
+          authProviderId: "github",
+        });
 
         user.role = socialUser?.role || "user";
         user.id = socialUser?._id || null;
